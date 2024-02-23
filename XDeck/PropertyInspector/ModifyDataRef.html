@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name=viewport
+        content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui,viewport-fit=cover">
+    <meta name=apple-mobile-web-app-capable content=yes>
+    <meta name=apple-mobile-web-app-status-bar-style content=black>
+    <title>Modify X Plane dataref</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdpi.css">
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdtools.common.js"></script>
+    <script src="ModifyDataRef.js"></script>
+</head>
+
+<body>
+    <div class="sdpi-wrapper">
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Dataref</div>
+            <input class="sdpi-item-value sdProperty" placeholder="i.e AirbusFBW/APUMaster" value="" id="dataref"
+                oninput="setSettings()">
+        </div>
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Dataref polling frequency (ms)</div>
+            <input type="number" class="sdpi-item-value sdProperty" value="5" id="pollFreq" oninput="setSettings()">
+        </div>
+
+        <div type="radio" class="sdpi-item" id="datarefModeSelect">
+            <div class="sdpi-item-label">Mode</div>
+            <div class="sdpi-item-value">
+                <div class="sdpi-item-child">
+                    <input id="modeIncrease" class="sdProperty sdCheckbox" type="radio" name="datarefMode" checked
+                        oninput="setSettings()" />
+                    <label for="modeIncrease" class="sdpi-item-label"><span></span>Increase</label>
+                </div>
+                <div class="sdpi-item-child">
+                    <input id="modeDecrease" class="sdProperty sdCheckbox" type="radio" name="datarefMode" checked
+                        oninput="setSettings()" />
+                    <label for="modeDecrease" class="sdpi-item-label"><span></span>Decrease</label>
+                </div>
+                <div class="sdpi-item-child">
+                    <input id="modeSet" class="sdProperty sdCheckbox" type="radio" name="datarefMode" checked
+                        oninput="setSettings()" />
+                    <label for="modeSet" class="sdpi-item-label"><span></span>Set</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="increaseRefSettings" style="display: none">
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Max dataref value</div>
+                <input type="number" value="1" id="maxRefVal" oninput="setSettings()"
+                    class="sdpi-item-value sdProperty">
+            </div>
+        </div>
+
+        <div id="decreaseRefSettings" style="display: none">
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Min dataref value</div>
+                <input type="number" value="0" id="minRefVal" oninput="setSettings()"
+                    class="sdpi-item-value sdProperty">
+            </div>
+        </div>
+
+        <div id="setRefSettings" style="display: none">
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Value to set</div>
+                <input type="number" value="1" id="setRefVal" oninput="setSettings()"
+                    class="sdpi-item-value sdProperty">
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "dgSpecHash": "9fJjingmWQVJdPp9ZaeduYbIdNQFy3ZC6wR7sHI6xSdVXrrDQJmZRh182I31LrVzPUA1sOZa5tyW3x/4Uk5WwA==",
+  "success": true,
+  "projectFilePath": "C:\\projects\\XDeck\\XDeck-net8\\XDeck\\XDeck.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\valtt\\.nuget\\packages\\commandlineparser\\2.9.1\\commandlineparser.2.9.1.nupkg.sha512",
+    "C:\\Users\\valtt\\.nuget\\packages\\microsoft.win32.systemevents\\8.0.0\\microsoft.win32.systemevents.8.0.0.nupkg.sha512",
+    "C:\\Users\\valtt\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\valtt\\.nuget\\packages\\nlog\\5.2.8\\nlog.5.2.8.nupkg.sha512",
+    "C:\\Users\\valtt\\.nuget\\packages\\streamdeck-tools\\6.2.0\\streamdeck-tools.6.2.0.nupkg.sha512",
+    "C:\\Users\\valtt\\.nuget\\packages\\system.configuration.configurationmanager\\8.0.0\\system.configuration.configurationmanager.8.0.0.nupkg.sha512",
+    "C:\\Users\\valtt\\.nuget\\packages\\system.diagnostics.eventlog\\8.0.0\\system.diagnostics.eventlog.8.0.0.nupkg.sha512",
+    "C:\\Users\\valtt\\.nuget\\packages\\system.drawing.common\\8.0.2\\system.drawing.common.8.0.2.nupkg.sha512",
+    "C:\\Users\\valtt\\.nuget\\packages\\system.security.cryptography.protecteddata\\8.0.0\\system.security.cryptography.protecteddata.8.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
