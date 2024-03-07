@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name=viewport
+        content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui,viewport-fit=cover">
+    <meta name=apple-mobile-web-app-capable content=yes>
+    <meta name=apple-mobile-web-app-status-bar-style content=black>
+    <title>APListen action</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdpi.css">
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdtools.common.js"></script>
+</head>
+
+<body>
+    <div class="sdpi-wrapper">
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Dataref</div>
+            <input class="sdpi-item-value sdProperty" placeholder="i.e AirbusFBW/APUMaster" value="" id="dataref"
+                oninput="setSettings()">
+        </div>
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Dataref polling frequency (ms)</div>
+            <input type="number" class="sdpi-item-value sdProperty" value="5" id="pollFreq" oninput="setSettings()">
+        </div>
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Type SPEED, HEADING, ALTITUDE, VERTICALSPEED</div>
+            <input class="sdpi-item-value sdProperty" placeholder="i.e AirbusFBW/APUMaster" value="" id="type"
+                oninput="setSettings()">
+        </div>
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Dashed dataref</div>
+            <input class="sdpi-item-value sdProperty" placeholder="i.e AirbusFBW/APUMaster" value="" id="dashedDataref"
+                oninput="setSettings()">
+        </div>
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Managed dataref</div>
+            <input class="sdpi-item-value sdProperty" placeholder="i.e AirbusFBW/APUMaster" value="" id="managedDataref"
+                oninput="setSettings()">
+        </div>
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Is Mach dataref</div>
+            <input class="sdpi-item-value sdProperty" placeholder="i.e AirbusFBW/APUMaster" value="" id="isMachDataref"
+                oninput="setSettings()">
+        </div>
+    </div>
+</body>
+
+</html>

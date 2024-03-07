@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name=viewport
+        content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui,viewport-fit=cover">
+    <meta name=apple-mobile-web-app-capable content=yes>
+    <meta name=apple-mobile-web-app-status-bar-style content=black>
+    <title>Send command to X Plane</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdpi.css">
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdtools.common.js"></script>
+</head>
+
+<body>
+    <div class="sdpi-wrapper">
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Dataref</div>
+            <input class="sdpi-item-value sdProperty" placeholder="i.e AirbusFBW/APUMaster" value="" id="dataref"
+                oninput="setSettings()" />
+        </div>
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Polling frequency (ms)</div>
+            <input type="number" class="sdpi-item-value sdProperty" value="5" id="pollFreq" oninput="setSettings()" />
+        </div>
+        <div id="valueElements">
+            <div class="dataref-value" style="margin-bottom: 1rem;">
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">Value</div>
+                    <input class="sdpi-item-value value-input" type="number" oninput="setSettings()" />
+                </div>
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">Title</div>
+                    <textarea class="sdpi-item-value title-input" type="text" oninput="setSettings()"
+                        rows="4"></textarea>
+                </div>
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">Image</div>
+                    <input class="sdpi-item-value image-path-input" type="text" oninput="setSettings()" />
+                </div>
+            </div>
+        </div>
+        <div
+            style="display: flex; justify-content: end; align-items: center; gap: 10px; margin-top: 1rem; max-width: 344px;">
+            <button id="addElementBtn">Add Element</button>
+            <button id="removeElementBtn">Remove Element</button>
+        </div>
+    </div>
+    <script src="MultiListener.js"></script>
+</body>
+
+</html>
