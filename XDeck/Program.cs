@@ -1,15 +1,14 @@
 ﻿using BarRaider.SdTools;
 
-namespace XDeck
+using XDeck.Backend;
+
+namespace XDeck;
+internal class Program
 {
-    internal class Program
+    private static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-#if DEBUG
-            System.Diagnostics.Debugger.Launch();
-#endif
-            SDWrapper.Run(args);
-        }
+        var connector = XConnector.Instance;
+        connector.Init();
+        SDWrapper.Run(args);
     }
 }

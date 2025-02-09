@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BarRaider.SdTools;
-using CommandLine;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using XPlaneConnector;
+
+using XDeck.Backend;
+
+using XPlaneConnector.Core;
 
 namespace XDeck.Actions
 {
@@ -22,7 +21,7 @@ namespace XDeck.Actions
                 return new PluginSettings
                 {
                     Dataref = "sim/none/none",
-                    Frequency = "20",
+                    Frequency = "55",
                     IncreaseDatarefMode = true, // Ensure default settings comply with the business rules
                     // DecreaseDatarefMode and SetDatarefMode are false by default
                     MaxRefValue = "1",
@@ -33,33 +32,33 @@ namespace XDeck.Actions
             }
 
             [JsonProperty(PropertyName = "dataref")]
-            public string Dataref { get; set; }
+            public string Dataref { get; set; } = "sim/none/none";
             [JsonProperty(PropertyName = "pollFreq")]
-            public string Frequency { get; set; }
+            public string Frequency { get; set; } = "5";
 
             [JsonProperty(PropertyName = "modeIncrease")]
-            public bool IncreaseDatarefMode { get; set; }
+            public bool IncreaseDatarefMode { get; set; } = true;
 
             [JsonProperty(PropertyName = "modeDecrease")]
-            public bool DecreaseDatarefMode { get; set; }
+            public bool DecreaseDatarefMode { get; set; } = false;
 
             [JsonProperty(PropertyName = "modeSet")]
-            public bool SetDatarefMode { get; set; }
+            public bool SetDatarefMode { get; set; } = false;
 
             [JsonProperty(PropertyName = "maxRefVal")]
-            public string MaxRefValue { get; set; }
+            public string MaxRefValue { get; set; } = "1";
             [JsonProperty(PropertyName = "minRefVal")]
-            public string MinRefValue { get; set; }
+            public string MinRefValue { get; set; } = "0";
 
             [JsonProperty(PropertyName = "setRefVal")]
-            public string SetRefValue { get; set; }
+            public string SetRefValue { get; set; } = "1";
 
         }
         #endregion
 
-        protected readonly PluginSettings _settings;
+        protected readonly PluginSettings? _settings;
         private readonly XConnector _connector;
-        private string _currentDataref = null;
+        private string? _currentDataref;
         private int _currentValue = 0;
 
 
@@ -80,11 +79,18 @@ namespace XDeck.Actions
 
         public override void Dispose()
         {
+            if (_currentDataref != null)
+            {
+                _connector.Unsubscribe(_currentDataref);
+                Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
+            }
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
+            GC.SuppressFinalize(this);
         }
 
         public override void KeyPressed(KeyPayload payload)
         {
+            if (_settings == null) return;
             if (_settings.IncreaseDatarefMode)
             {
                 HandleIncreaseMode();
@@ -101,6 +107,8 @@ namespace XDeck.Actions
 
         private void HandleIncreaseMode()
         {
+            if (_settings == null) return;
+            if (_currentDataref is null) return;
             if (int.TryParse(_settings.MaxRefValue, out int maxVal) && _currentValue < maxVal)
             {
                 _connector.SetDataRefValue(_currentDataref, _currentValue + 1);
@@ -109,6 +117,8 @@ namespace XDeck.Actions
 
         private void HandleDecreaseMode()
         {
+            if (_settings == null) return;
+            if (_currentDataref is null) return;
             if (int.TryParse(_settings.MinRefValue, out int minVal) && _currentValue > minVal)
             {
                 _connector.SetDataRefValue(_currentDataref, _currentValue - 1);
@@ -117,6 +127,8 @@ namespace XDeck.Actions
 
         private void HandleSetMode()
         {
+            if (_settings == null) return;
+            if (_currentDataref is null) return;
             if (int.TryParse(_settings.SetRefValue, out int setVal))
             {
                 _connector.SetDataRefValue(_currentDataref, setVal);
@@ -145,11 +157,12 @@ namespace XDeck.Actions
 
         private void SubscribeDataref()
         {
+            if (_settings == null) return;
             if (!int.TryParse(_settings.Frequency, out int freq)) return;
             if (_currentDataref == _settings.Dataref) return;
             if (_currentDataref != null)
             {
-                _connector.Connector.Unsubscribe(_currentDataref);
+                _connector.Unsubscribe(_currentDataref);
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
             }
             _currentDataref = _settings.Dataref;
@@ -162,14 +175,12 @@ namespace XDeck.Actions
                 Frequency = freq
             };
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {_settings.Dataref}");
-            _connector.Connector.Subscribe(dataref, dataref.Frequency, (element, val) =>
-            {
-                _currentValue = (int)val;
-            });
+            _connector.Subscribe(dataref, (element, val) => _currentValue = (int)val);
         }
 
         private void SaveSettings()
         {
+            if (_settings == null) return;
             Connection.SetSettingsAsync(JObject.FromObject(_settings));
         }
     }

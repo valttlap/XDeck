@@ -1,24 +1,23 @@
 ﻿using BarRaider.SdTools;
 
+using XDeck.Backend;
+
 namespace XDeck.Actions
 {
     [PluginActionId("com.valtteri.connstop")]
-    public class StopAction : KeypadBase
+    public class StopAction(SDConnection connection, InitialPayload payload) : KeypadBase(connection, payload)
     {
-        private readonly XConnector _connector;
-        public StopAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
-        {
-            _connector = XConnector.Instance;
-        }
+        private readonly XConnector _connector = XConnector.Instance;
 
         public override void Dispose()
         {
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} Destructor called");
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
+            GC.SuppressFinalize(this);
         }
 
         public override void KeyPressed(KeyPayload payload)
         {
-            _connector.Disconnect();
+            _connector.Stop();
         }
 
         public override void KeyReleased(KeyPayload payload)

@@ -1,11 +1,13 @@
+using System.Drawing;
+
 using BarRaider.SdTools;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Drawing;
-using System.IO;
-using System.Threading.Tasks;
-using XPlaneConnector;
+
+using XDeck.Backend;
+
+using XPlaneConnector.Core;
 
 namespace XDeck.Actions
 {
@@ -18,7 +20,7 @@ namespace XDeck.Actions
         {
             public static PluginSettings CreateDefaultSettings()
             {
-                PluginSettings instance = new PluginSettings
+                PluginSettings instance = new()
                 {
                     Dataref = "sim/none/none",
                     Frequency = 5,
@@ -37,66 +39,62 @@ namespace XDeck.Actions
             }
 
             [JsonProperty(PropertyName = "dataref")]
-            public string Dataref { get; set; }
+            public string Dataref { get; set; } = "sim/none/none";
 
             [JsonProperty(PropertyName = "pollFreq")]
-            public int Frequency { get; set; }
+            public int Frequency { get; set; } = 5;
 
             [JsonProperty(PropertyName = "modeImage")]
-            public bool ImageMode { get; set; }
+            public bool ImageMode { get; set; } = false;
 
             [JsonProperty(PropertyName = "modeTitle")]
-            public bool TitleMode { get; set; }
+            public bool TitleMode { get; set; } = true;
 
             [JsonProperty(PropertyName = "modeTitleImage")]
-            public bool TitleImageMode { get; set; }
+            public bool TitleImageMode { get; set; } = false;
 
             [FilenameProperty]
             [JsonProperty(PropertyName = "image0")]
-            public string Image0 { get; set; }
+            public string? Image0 { get; set; }
 
             [FilenameProperty]
             [JsonProperty(PropertyName = "image1")]
-            public string Image1 { get; set; }
+            public string? Image1 { get; set; }
 
             [FilenameProperty]
             [JsonProperty(PropertyName = "image2")]
-            public string Image2 { get; set; }
+            public string? Image2 { get; set; }
 
             [JsonProperty(PropertyName = "title0")]
-            public string Title0 { get; set; }
+            public string? Title0 { get; set; }
 
             [JsonProperty(PropertyName = "title1")]
-            public string Title1 { get; set; }
+            public string? Title1 { get; set; }
 
             [JsonProperty(PropertyName = "title2")]
-            public string Title2 { get; set; }
+            public string? Title2 { get; set; }
         }
         #endregion
 
 
-        protected readonly PluginSettings settings;
-        private readonly object _imageLock = new object();
+        protected readonly PluginSettings? _settings;
+        private readonly object _imageLock = new();
         private readonly XConnector _connector;
-        private string _currentDataref = null;
+        private string? _currentDataref = null;
         private int _currentState = 0;
 
-        protected readonly string defaultIcon = ".\\Images\\pluginAction.png";
+        protected readonly string _defaultIcon = ".\\Images\\pluginAction.png";
 
-        private Image _image0;
-        private Image _image1;
-        private Image _image2;
+        private Image? _image0;
+        private Image? _image1;
+        private Image? _image2;
 
         public LightStatusAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
         {
-            if (payload.Settings == null || payload.Settings.Count == 0) // Called the first time you drop a new action into the Stream Deck
-            {
-                this.settings = PluginSettings.CreateDefaultSettings();
-            }
-            else
-            {
-                this.settings = payload.Settings.ToObject<PluginSettings>();
-            }
+            _settings = payload.Settings == null || payload.Settings.Count == 0
+                ? PluginSettings.CreateDefaultSettings()
+                : payload.Settings.ToObject<PluginSettings>();
+
             _connector = XConnector.Instance;
             IntializeSettings();
             SubscribeDataref();
@@ -106,7 +104,14 @@ namespace XDeck.Actions
 
         public override void Dispose()
         {
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} Destructor called");
+            if (_currentDataref != null)
+            {
+                _connector.Unsubscribe(_currentDataref);
+                Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
+            }
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
+
+            GC.SuppressFinalize(this);
         }
 
         public override void KeyPressed(KeyPayload payload)
@@ -128,7 +133,7 @@ namespace XDeck.Actions
 
         public override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
-            try { Tools.AutoPopulateSettings(settings, payload.Settings); }
+            try { Tools.AutoPopulateSettings(_settings, payload.Settings); }
             catch { }
             IntializeSettings();
             SubscribeDataref();
@@ -137,23 +142,24 @@ namespace XDeck.Actions
 
         private void SubscribeDataref()
         {
-            if (_currentDataref == settings.Dataref) return;
+            if (_settings == null) return;
+            if (_currentDataref == _settings.Dataref) return;
             if (_currentDataref != null)
             {
-                _connector.Connector.Unsubscribe(_currentDataref);
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} Unsubscribed dataref: {_currentDataref}");
+                _connector.Unsubscribe(_currentDataref);
+                Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
             }
-            _currentDataref = settings.Dataref;
+            _currentDataref = _settings.Dataref;
 
             var dataref = new DataRefElement
             {
-                DataRef = settings.Dataref,
+                DataRef = _settings.Dataref,
                 Units = "Unknown",
                 Description = "Userdefined datared",
-                Frequency = settings.Frequency
+                Frequency = _settings.Frequency
             };
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} Subscribing dataref: {settings.Dataref}");
-            _connector.Connector.Subscribe(dataref, dataref.Frequency, async (element, val) =>
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {_settings.Dataref}");
+            _connector.Subscribe(dataref, async (element, val) =>
             {
                 _currentState = (int)val;
                 await SetImageTitleAsync();
@@ -162,22 +168,23 @@ namespace XDeck.Actions
 
         private async Task SetImageTitleAsync()
         {
-            string title;
-            Image image;
+            if (_settings == null) return;
+            string? title;
+            Image? image;
 
             switch (_currentState)
             {
                 case 0:
                     image = _image0;
-                    title = settings.Title0;
+                    title = _settings.Title0;
                     break;
                 case 1:
                     image = _image1;
-                    title = settings.Title1;
+                    title = _settings.Title1;
                     break;
                 case 2:
                     image = _image2;
-                    title = settings.Title2;
+                    title = _settings.Title2;
                     break;
                 default:
                     image = null;
@@ -185,12 +192,12 @@ namespace XDeck.Actions
                     break;
             }
 
-            if (settings.TitleMode || settings.TitleImageMode)
+            if (_settings.TitleMode || _settings.TitleImageMode)
             {
                 await Connection.SetTitleAsync(title);
             }
 
-            if (settings.ImageMode || settings.TitleImageMode)
+            if (_settings.ImageMode || _settings.TitleImageMode)
             {
                 await Connection.SetImageAsync(image);
             }
@@ -203,21 +210,22 @@ namespace XDeck.Actions
 
         private void PrefetchImages()
         {
+            if (_settings == null) return;
             lock (_imageLock)
             {
-                _image0 = LoadImage(settings.Image0) ?? LoadImage(defaultIcon);
-                _image1 = LoadImage(settings.Image1) ?? LoadImage(defaultIcon);
-                _image2 = LoadImage(settings.Image2) ?? LoadImage(defaultIcon);
+                _image0 = LoadImage(_settings.Image0) ?? LoadImage(_defaultIcon);
+                _image1 = LoadImage(_settings.Image1) ?? LoadImage(_defaultIcon);
+                _image2 = LoadImage(_settings.Image2) ?? LoadImage(_defaultIcon);
             }
         }
 
-        private Image LoadImage(string imagePath)
+        private Image? LoadImage(string? imagePath)
         {
-            if (String.IsNullOrEmpty(imagePath) || !File.Exists(imagePath))
+            if (string.IsNullOrEmpty(imagePath) || !File.Exists(imagePath))
             {
                 string currentDirectory = Directory.GetCurrentDirectory();
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"{this.GetType()} Current directory: {currentDirectory}");
-                Logger.Instance.LogMessage(TracingLevel.ERROR, $"{this.GetType()} Background image file not found {imagePath}");
+                Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Current directory: {currentDirectory}");
+                Logger.Instance.LogMessage(TracingLevel.ERROR, $"{GetType()} Background image file not found {imagePath}");
                 return null;
             }
 
@@ -226,7 +234,8 @@ namespace XDeck.Actions
 
         private void SaveSettings()
         {
-            Connection.SetSettingsAsync(JObject.FromObject(settings));
+            if (_settings == null) return;
+            Connection.SetSettingsAsync(JObject.FromObject(_settings));
         }
 
     }

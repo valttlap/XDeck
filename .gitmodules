@@ -1,3 +1,3 @@
-[submodule "XDeck-net8/XPlaneConnector"]
-	path = XDeck-net8/XPlaneConnector
+[submodule "XPlaneConnector"]
+	path = XPlaneConnector
 	url = git@github.com:valttlap/XPlaneConnector.git
