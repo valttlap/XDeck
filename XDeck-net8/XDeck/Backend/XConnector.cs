@@ -1,12 +1,13 @@
 using System.Net;
+
 using XPlaneConnector.Core;
 
 namespace XDeck.Backend;
 
 public sealed class XConnector
 {
-    private static readonly Lazy<XConnector> _lazy = new Lazy<XConnector>(() => new XConnector());
-    public static XConnector Instance => _lazy.Value;
+    private static readonly Lazy<XConnector> Lazy = new(() => new XConnector());
+    public static XConnector Instance => Lazy.Value;
     private CancellationTokenSource? _cts;
     private Connector? _connector;
     public delegate void ConnectionStarted();
@@ -80,8 +81,7 @@ public sealed class XConnector
 
     public CancellationTokenSource StartCommand(XPlaneCommand command)
     {
-        if (_connector is null) return new CancellationTokenSource();
-        return _connector.StartCommand(command);
+        return _connector is null ? new CancellationTokenSource() : _connector.StartCommand(command);
     }
 
     public void SetDataRefValue(DataRefElement dataRef, float value)

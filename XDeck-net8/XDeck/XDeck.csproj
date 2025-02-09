@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <StartupObject>XDeck.Program</StartupObject>
     <AssemblyName>com.valtteri.xdeck</AssemblyName>
-    <Copyright>Copyright © 2024</Copyright>
+    <Copyright>Copyright © 2025</Copyright>
     <OutputPath>bin\$(Configuration)\com.valtteri.xdeck.sdPlugin\</OutputPath>
     <Platforms>AnyCPU</Platforms>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -15,19 +15,18 @@
     <Authors>Valtteri Lappalainen</Authors>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+<!--   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>$(APPDATA)\Elgato\StreamDeck\Plugins\com.valtteri.xdeck.sdPlugin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  </PropertyGroup> -->
+<!--   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>$(APPDATA)\Elgato\StreamDeck\Plugins\com.valtteri.xdeck.sdPlugin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-  </PropertyGroup>
+  </PropertyGroup> -->
 
   <ItemGroup>
-    <PackageReference Include="StreamDeck-Tools" Version="6.2.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.2" />
+    <PackageReference Include="StreamDeck-Tools" Version="6.3.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,11 +46,11 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+<!--   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="taskkill -f -t -im StreamDeck.exe -fi &quot;status eq running&quot;" />
   </Target>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="call &quot;%ProgramW6432%\Elgato\StreamDeck\StreamDeck.exe&quot;" />
   </Target>
-
+ -->
 </Project>

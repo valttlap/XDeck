@@ -1,13 +1,13 @@
 {
   "Actions": [
     {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "Send command",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": false,
@@ -16,13 +16,13 @@
       "PropertyInspectorPath": "PropertyInspector/SendAction.html"
     },
     {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "Press&Hold command loop",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": false,
@@ -31,13 +31,13 @@
       "PropertyInspectorPath": "PropertyInspector/PressHoldLoop.html"
     },
     {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "Press&Hold command",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": false,
@@ -46,13 +46,13 @@
       "PropertyInspectorPath": "PropertyInspector/SendAction.html"
     },
     {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "Start connection",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": false,
@@ -61,13 +61,13 @@
       "PropertyInspectorPath": "PropertyInspector/PluginActionPI.html"
     },
     {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "Stop connection",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": false,
@@ -76,13 +76,13 @@
       "PropertyInspectorPath": "PropertyInspector/PluginActionPI.html"
     },
     {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "3-way listener",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": false,
@@ -91,13 +91,13 @@
       "PropertyInspectorPath": "PropertyInspector/LightStatusAction.html"
     },
     {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "Listen dataref",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": false,
@@ -106,28 +106,13 @@
       "PropertyInspectorPath": "PropertyInspector/ListenDataref.html"
     },
     {
-      "Icon": "Images/icon",
-      "Name": "Listen frequency dataref",
-      "States": [
-        {
-          "Image": "Images/empty",
-          "TitleAlignment": "middle",
-          "FontSize": "12"
-        }
-      ],
-      "SupportedInMultiActions": false,
-      "Tooltip": "Listen dataref",
-      "UUID": "com.valtteri.freqlistener",
-      "PropertyInspectorPath": "PropertyInspector/ListenDataref.html"
-    },
-    {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "Switch",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": false,
@@ -136,13 +121,13 @@
       "PropertyInspectorPath": "PropertyInspector/SwitchAction.html"
     },
     {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "Modify dataref",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": true,
@@ -151,45 +136,29 @@
       "PropertyInspectorPath": "PropertyInspector/ModifyDataRef.html"
     },
     {
-      "Icon": "Images/icon",
+      "Icon": "Images/plane-icon",
       "Name": "Listen multiple datarefs",
       "States": [
         {
           "Image": "Images/empty",
           "TitleAlignment": "middle",
-          "FontSize": "12"
+          "FontSize": 12
         }
       ],
       "SupportedInMultiActions": true,
       "Tooltip": "Listen multiple datarefs",
       "UUID": "com.valtteri.multilistener",
       "PropertyInspectorPath": "PropertyInspector/MultiListener.html"
-    },
-    {
-      "Icon": "Images/icon",
-      "Name": "Listen AP",
-      "States": [
-        {
-          "Image": "Images/empty",
-          "TitleAlignment": "middle",
-          "FontSize": "12"
-        }
-      ],
-      "SupportedInMultiActions": true,
-      "Tooltip": "Listen AP",
-      "UUID": "com.valtteri.aplistener",
-      "PropertyInspectorPath": "PropertyInspector/APListenerAction.html"
     }
   ],
   "Author": "Valtteri Lappalainen",
   "Name": "XDeck",
   "Description": "App to control X Plane trough stream deck",
   "Icon": "Images/pluginIcon",
-  "URL": "http://localhost/",
-  "Version": "1.0",
-  "CodePathWin": "com.valtteri.xdeck.exe",
+  "Version": "1.0.1.0",
+  "CodePath": "com.valtteri.xdeck.exe",
   "Category": "XDeck",
-  "CategoryIcon": "Images/categoryIcon",
+  "CategoryIcon": "Images/plane-icon",
   "OS": [
     {
       "Platform": "windows",
@@ -198,6 +167,7 @@
   ],
   "SDKVersion": 2,
   "Software": {
-    "MinimumVersion": "4.9"
-  }
+    "MinimumVersion": "6.4"
+  },
+  "UUID": "com.valtteri.xdeck"
 }

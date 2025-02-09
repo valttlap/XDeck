@@ -1,6 +1,9 @@
 ﻿using BarRaider.SdTools;
+
 using Newtonsoft.Json;
+
 using XDeck.Backend;
+
 using XPlaneConnector.Core;
 
 namespace XDeck.Actions
@@ -13,7 +16,7 @@ namespace XDeck.Actions
         {
             public static PluginSettings CreateDefaultSettings()
             {
-                PluginSettings instance = new PluginSettings
+                PluginSettings instance = new()
                 {
                     Dataref = "sim/none/none"
                 };
@@ -32,21 +35,17 @@ namespace XDeck.Actions
         }
         #endregion
 
-        protected readonly PluginSettings? settings;
+        protected readonly PluginSettings? _settings;
 
         private readonly XConnector _connector;
         private string? _currentDataref;
 
         public ListenDatarefAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
         {
-            if (payload.Settings == null || payload.Settings.Count == 0) // Called the first time you drop a new action into the Stream Deck
-            {
-                settings = PluginSettings.CreateDefaultSettings();
-            }
-            else
-            {
-                settings = payload.Settings.ToObject<PluginSettings>();
-            }
+            _settings = payload.Settings == null || payload.Settings.Count == 0
+                ? PluginSettings.CreateDefaultSettings()
+                : payload.Settings.ToObject<PluginSettings>();
+
             _connector = XConnector.Instance;
             SubscribeDataref();
         }
@@ -60,6 +59,8 @@ namespace XDeck.Actions
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
             }
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
+
+            GC.SuppressFinalize(this);
         }
 
         public override void KeyPressed(KeyPayload payload)
@@ -82,7 +83,7 @@ namespace XDeck.Actions
         {
             try
             {
-                Tools.AutoPopulateSettings(settings, payload.Settings);
+                Tools.AutoPopulateSettings(_settings, payload.Settings);
             }
             catch { }
             SubscribeDataref();
@@ -90,26 +91,26 @@ namespace XDeck.Actions
 
         private void SubscribeDataref()
         {
-            if (settings == null) return;
+            if (_settings == null) return;
             if (_currentDataref != null)
             {
                 _connector.Unsubscribe(_currentDataref);
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
             }
-            _currentDataref = settings.Dataref;
+            _currentDataref = _settings.Dataref;
 
             var dataref = new DataRefElement
             {
-                DataRef = settings.Dataref,
+                DataRef = _settings.Dataref,
                 Units = "Unknown",
                 Description = "Userdefined datared",
-                Frequency = settings.Frequency
+                Frequency = _settings.Frequency
             };
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {settings.Dataref}");
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {_settings.Dataref}");
             _connector.Subscribe(dataref, async (element, val) =>
             {
-                await Connection.SetTitleAsync($"{val}  {settings.Units}");
-                Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribed dataref: {settings.Dataref}");
+                await Connection.SetTitleAsync($"{val}  {_settings.Units}");
+                Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribed dataref: {_settings.Dataref}");
             });
         }
     }

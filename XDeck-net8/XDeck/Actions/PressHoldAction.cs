@@ -1,12 +1,15 @@
 using BarRaider.SdTools;
+
 using Newtonsoft.Json;
+
 using XDeck.Backend;
+
 using XPlaneConnector.Core;
 
 namespace XDeck.Actions
 {
     [PluginActionId("com.valtteri.presshold")]
-    public class PressHoldAction : KeypadBase
+    public class PressHoldAction(SDConnection connection, InitialPayload payload) : KeypadBase(connection, payload)
     {
         #region Settings
 
@@ -14,7 +17,8 @@ namespace XDeck.Actions
         {
             public static PluginSettings CreateDefaultSettings()
             {
-                PluginSettings instance = new PluginSettings
+                PluginSettings instance = new()
+
                 {
                     Command = "sim/none/none"
                 };
@@ -27,42 +31,33 @@ namespace XDeck.Actions
         }
         #endregion
 
-        protected readonly PluginSettings? settings;
+        protected readonly PluginSettings? _settings = payload.Settings == null || payload.Settings.Count == 0
+                ? PluginSettings.CreateDefaultSettings()
+                : payload.Settings.ToObject<PluginSettings>();
 
-        private readonly XConnector _connector;
+        private readonly XConnector _connector = XConnector.Instance;
 
         private CancellationTokenSource? _cancelToken;
-        public PressHoldAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
-        {
-            if (payload.Settings == null || payload.Settings.Count == 0) // Called the first time you drop a new action into the Stream Deck
-            {
-                settings = PluginSettings.CreateDefaultSettings();
-            }
-            else
-            {
-                settings = payload.Settings.ToObject<PluginSettings>();
-            }
-            _connector = XConnector.Instance;
-        }
 
         public override void Dispose()
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
+            GC.SuppressFinalize(this);
         }
 
         public override void KeyPressed(KeyPayload payload)
         {
-            if (settings == null) return;
-            var command = new XPlaneCommand(settings.Command, "Userdefined command");
+            if (_settings == null) return;
+            var command = new XPlaneCommand(_settings.Command, "Userdefined command");
             _cancelToken = _connector.StartCommand(command);
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Started command: {settings.Command}");
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Started command: {_settings.Command}");
         }
 
         public override void KeyReleased(KeyPayload payload)
         {
             if (_cancelToken == null) return;
             _cancelToken.Cancel();
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Cancelled command: {settings?.Command}");
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Cancelled command: {_settings?.Command}");
         }
 
         public override void OnTick()
@@ -75,7 +70,7 @@ namespace XDeck.Actions
 
         public override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
-            try { Tools.AutoPopulateSettings(settings, payload.Settings); }
+            try { Tools.AutoPopulateSettings(_settings, payload.Settings); }
             catch { }
         }
     }

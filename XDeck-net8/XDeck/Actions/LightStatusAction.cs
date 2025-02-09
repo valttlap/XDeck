@@ -1,8 +1,12 @@
+using System.Drawing;
+
 using BarRaider.SdTools;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Drawing;
+
 using XDeck.Backend;
+
 using XPlaneConnector.Core;
 
 namespace XDeck.Actions
@@ -16,7 +20,7 @@ namespace XDeck.Actions
         {
             public static PluginSettings CreateDefaultSettings()
             {
-                PluginSettings instance = new PluginSettings
+                PluginSettings instance = new()
                 {
                     Dataref = "sim/none/none",
                     Frequency = 5,
@@ -73,13 +77,13 @@ namespace XDeck.Actions
         #endregion
 
 
-        protected readonly PluginSettings? settings;
+        protected readonly PluginSettings? _settings;
         private readonly object _imageLock = new();
         private readonly XConnector _connector;
         private string? _currentDataref = null;
         private int _currentState = 0;
 
-        protected readonly string defaultIcon = ".\\Images\\pluginAction.png";
+        protected readonly string _defaultIcon = ".\\Images\\pluginAction.png";
 
         private Image? _image0;
         private Image? _image1;
@@ -87,14 +91,10 @@ namespace XDeck.Actions
 
         public LightStatusAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
         {
-            if (payload.Settings == null || payload.Settings.Count == 0) // Called the first time you drop a new action into the Stream Deck
-            {
-                settings = PluginSettings.CreateDefaultSettings();
-            }
-            else
-            {
-                settings = payload.Settings.ToObject<PluginSettings>();
-            }
+            _settings = payload.Settings == null || payload.Settings.Count == 0
+                ? PluginSettings.CreateDefaultSettings()
+                : payload.Settings.ToObject<PluginSettings>();
+
             _connector = XConnector.Instance;
             IntializeSettings();
             SubscribeDataref();
@@ -110,6 +110,8 @@ namespace XDeck.Actions
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
             }
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
+
+            GC.SuppressFinalize(this);
         }
 
         public override void KeyPressed(KeyPayload payload)
@@ -131,7 +133,7 @@ namespace XDeck.Actions
 
         public override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
-            try { Tools.AutoPopulateSettings(settings, payload.Settings); }
+            try { Tools.AutoPopulateSettings(_settings, payload.Settings); }
             catch { }
             IntializeSettings();
             SubscribeDataref();
@@ -140,23 +142,23 @@ namespace XDeck.Actions
 
         private void SubscribeDataref()
         {
-            if (settings == null) return;
-            if (_currentDataref == settings.Dataref) return;
+            if (_settings == null) return;
+            if (_currentDataref == _settings.Dataref) return;
             if (_currentDataref != null)
             {
                 _connector.Unsubscribe(_currentDataref);
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
             }
-            _currentDataref = settings.Dataref;
+            _currentDataref = _settings.Dataref;
 
             var dataref = new DataRefElement
             {
-                DataRef = settings.Dataref,
+                DataRef = _settings.Dataref,
                 Units = "Unknown",
                 Description = "Userdefined datared",
-                Frequency = settings.Frequency
+                Frequency = _settings.Frequency
             };
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {settings.Dataref}");
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {_settings.Dataref}");
             _connector.Subscribe(dataref, async (element, val) =>
             {
                 _currentState = (int)val;
@@ -166,7 +168,7 @@ namespace XDeck.Actions
 
         private async Task SetImageTitleAsync()
         {
-            if (settings == null) return;
+            if (_settings == null) return;
             string? title;
             Image? image;
 
@@ -174,15 +176,15 @@ namespace XDeck.Actions
             {
                 case 0:
                     image = _image0;
-                    title = settings.Title0;
+                    title = _settings.Title0;
                     break;
                 case 1:
                     image = _image1;
-                    title = settings.Title1;
+                    title = _settings.Title1;
                     break;
                 case 2:
                     image = _image2;
-                    title = settings.Title2;
+                    title = _settings.Title2;
                     break;
                 default:
                     image = null;
@@ -190,12 +192,12 @@ namespace XDeck.Actions
                     break;
             }
 
-            if (settings.TitleMode || settings.TitleImageMode)
+            if (_settings.TitleMode || _settings.TitleImageMode)
             {
                 await Connection.SetTitleAsync(title);
             }
 
-            if (settings.ImageMode || settings.TitleImageMode)
+            if (_settings.ImageMode || _settings.TitleImageMode)
             {
                 await Connection.SetImageAsync(image);
             }
@@ -208,12 +210,12 @@ namespace XDeck.Actions
 
         private void PrefetchImages()
         {
-            if (settings == null) return;
+            if (_settings == null) return;
             lock (_imageLock)
             {
-                _image0 = LoadImage(settings.Image0) ?? LoadImage(defaultIcon);
-                _image1 = LoadImage(settings.Image1) ?? LoadImage(defaultIcon);
-                _image2 = LoadImage(settings.Image2) ?? LoadImage(defaultIcon);
+                _image0 = LoadImage(_settings.Image0) ?? LoadImage(_defaultIcon);
+                _image1 = LoadImage(_settings.Image1) ?? LoadImage(_defaultIcon);
+                _image2 = LoadImage(_settings.Image2) ?? LoadImage(_defaultIcon);
             }
         }
 
@@ -227,15 +229,13 @@ namespace XDeck.Actions
                 return null;
             }
 
-#pragma warning disable CA1416 // Validate platform compatibility
             return Image.FromFile(imagePath);
-#pragma warning restore CA1416 // Validate platform compatibility
         }
 
         private void SaveSettings()
         {
-            if (settings == null) return;
-            Connection.SetSettingsAsync(JObject.FromObject(settings));
+            if (_settings == null) return;
+            Connection.SetSettingsAsync(JObject.FromObject(_settings));
         }
 
     }

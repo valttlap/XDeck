@@ -1,8 +1,12 @@
 using System.Drawing;
+
 using BarRaider.SdTools;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using XDeck.Backend;
+
 using XPlaneConnector.Core;
 
 namespace XDeck.Actions;
@@ -14,6 +18,7 @@ public class MultiListenerAction : KeypadBase
     protected class PluginSettings
     {
         private string? _settingsJson;
+
         [JsonProperty(PropertyName = "dataref")]
         public string Dataref { get; set; } = "sim/none/none";
 
@@ -66,7 +71,8 @@ public class MultiListenerAction : KeypadBase
         public Image? Image { get; set; }
     }
     #endregion
-    private PluginSettings? _settings;
+
+    private readonly PluginSettings? _settings;
     private readonly object _imageLock = new();
     private readonly XConnector _connector;
     private string? _currentDataref;
@@ -83,7 +89,7 @@ public class MultiListenerAction : KeypadBase
             _settings = payload.Settings.ToObject<PluginSettings>();
         }
         _connector = XConnector.Instance;
-        if (_settings == null || _settings.Settings == null || _settings.Settings.Count == 0) return;
+        if (_settings is null || _settings.Settings is null || _settings.Settings.Count == 0) return;
         InitializeSettings();
         SubscribeDataref();
         SaveSettings();
@@ -91,7 +97,7 @@ public class MultiListenerAction : KeypadBase
     }
     public override void Dispose()
     {
-        if (_currentDataref != null)
+        if (_currentDataref is not null)
         {
             _connector.Unsubscribe(_currentDataref);
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
@@ -221,8 +227,7 @@ public class MultiListenerAction : KeypadBase
 
     private static Image? LoadImage(string? imagePath)
     {
-        if (string.IsNullOrEmpty(imagePath) || !File.Exists(imagePath)) return null;
-        return Image.FromFile(imagePath);
+        return string.IsNullOrEmpty(imagePath) || !File.Exists(imagePath) ? null : Image.FromFile(imagePath);
     }
 
     private void SaveSettings()

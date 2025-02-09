@@ -1,7 +1,10 @@
 using BarRaider.SdTools;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using XDeck.Backend;
+
 using XPlaneConnector.Core;
 
 namespace XDeck.Actions
@@ -82,6 +85,7 @@ namespace XDeck.Actions
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
             }
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
+            GC.SuppressFinalize(this);
         }
 
         public override void KeyPressed(KeyPayload payload)
@@ -171,10 +175,7 @@ namespace XDeck.Actions
                 Frequency = freq
             };
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {_settings.Dataref}");
-            _connector.Subscribe(dataref, (element, val) =>
-            {
-                _currentValue = (int)val;
-            });
+            _connector.Subscribe(dataref, (element, val) => _currentValue = (int)val);
         }
 
         private void SaveSettings()

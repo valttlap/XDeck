@@ -1,12 +1,15 @@
 using BarRaider.SdTools;
+
 using Newtonsoft.Json;
+
 using XDeck.Backend;
+
 using XPlaneConnector.Core;
 
 namespace XDeck.Actions
 {
     [PluginActionId("com.valtteri.pressholdloop")]
-    public class PressHoldLoopAction : KeypadBase
+    public class PressHoldLoopAction(SDConnection connection, InitialPayload payload) : KeypadBase(connection, payload)
     {
         #region Settings
 
@@ -14,7 +17,8 @@ namespace XDeck.Actions
         {
             public static PluginSettings CreateDefaultSettings()
             {
-                PluginSettings instance = new PluginSettings
+                PluginSettings instance = new()
+
                 {
                     Command = "sim/none/none",
                     WaitTime = 500,
@@ -35,34 +39,25 @@ namespace XDeck.Actions
         }
         #endregion
 
-        protected readonly PluginSettings? settings;
+        protected readonly PluginSettings? _settings = payload.Settings == null || payload.Settings.Count == 0
+                ? PluginSettings.CreateDefaultSettings()
+                : payload.Settings.ToObject<PluginSettings>();
 
         private bool _isPressed = false;
 
-        private readonly XConnector _connector;
-        public PressHoldLoopAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
-        {
-            if (payload.Settings == null || payload.Settings.Count == 0) // Called the first time you drop a new action into the Stream Deck
-            {
-                settings = PluginSettings.CreateDefaultSettings();
-            }
-            else
-            {
-                settings = payload.Settings.ToObject<PluginSettings>();
-            }
-            _connector = XConnector.Instance;
-        }
+        private readonly XConnector _connector = XConnector.Instance;
 
         public override void Dispose()
         {
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
+            GC.SuppressFinalize(this);
         }
 
         public override async void KeyPressed(KeyPayload payload)
         {
-            if (settings == null) return;
+            if (_settings == null) return;
             _isPressed = true;
-            var command = new XPlaneCommand(settings.Command, "Userdefined command");
+            var command = new XPlaneCommand(_settings.Command, "Userdefined command");
             _connector.SendCommand(command);
             await ButtonPressing(command);
 
@@ -83,21 +78,21 @@ namespace XDeck.Actions
 
         public override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
-            try { Tools.AutoPopulateSettings(settings, payload.Settings); }
+            try { Tools.AutoPopulateSettings(_settings, payload.Settings); }
             catch { }
         }
 
         private async Task ButtonPressing(XPlaneCommand command)
         {
-            if (settings == null) return;
-            await Task.Delay(settings.WaitTime); // 0.5 sec delay before the loop starts
+            if (_settings == null) return;
+            await Task.Delay(_settings.WaitTime); // 0.5 sec delay before the loop starts
 
             if (!_isPressed) // if button is released before 0.5 sec
             {
                 return;
             }
 
-            var timer = new System.Timers.Timer(settings.LoopTime);
+            var timer = new System.Timers.Timer(_settings.LoopTime);
             timer.Elapsed += (sender, e) => _connector.SendCommand(command);
             timer.Start();
 
@@ -105,7 +100,7 @@ namespace XDeck.Actions
             {
                 while (_isPressed)
                 {
-                    Thread.Sleep(settings.LoopTime);
+                    Thread.Sleep(_settings.LoopTime);
                 }
 
                 timer.Stop();

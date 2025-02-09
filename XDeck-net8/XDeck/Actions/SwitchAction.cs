@@ -1,8 +1,12 @@
-﻿using BarRaider.SdTools;
+﻿using System.Drawing;
+
+using BarRaider.SdTools;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Drawing;
+
 using XDeck.Backend;
+
 using XPlaneConnector.Core;
 
 namespace XDeck.Actions
@@ -16,7 +20,8 @@ namespace XDeck.Actions
         {
             public static PluginSettings CreateDefaultSettings()
             {
-                PluginSettings instance = new PluginSettings
+                PluginSettings instance = new()
+
                 {
                     Dataref = "sim/none/none",
                     Frequency = 5,
@@ -77,8 +82,8 @@ namespace XDeck.Actions
 
 
         protected readonly PluginSettings? settings;
-        protected string defaultOffImageLocation = ".\\Images\\empty_button_off.png";
-        protected string defaultOnImageLocation = ".\\Images\\empty_button_on.png";
+        protected string _defaultOffImageLocation = ".\\Images\\empty_button_off.png";
+        protected string _defaultOnImageLocation = ".\\Images\\empty_button_on.png";
         private readonly object _imageLock = new();
         private readonly XConnector _connector;
         private string? _currentDataref;
@@ -112,6 +117,7 @@ namespace XDeck.Actions
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
             }
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
+            GC.SuppressFinalize(this);
         }
 
         public override void KeyPressed(KeyPayload payload)
@@ -218,8 +224,8 @@ namespace XDeck.Actions
         {
             lock (_imageLock)
             {
-                _offImage = LoadImage(settings?.OffImage) ?? LoadImage(defaultOffImageLocation);
-                _onImage = LoadImage(settings?.OnImage) ?? LoadImage(defaultOnImageLocation);
+                _offImage = LoadImage(settings?.OffImage) ?? LoadImage(_defaultOffImageLocation);
+                _onImage = LoadImage(settings?.OnImage) ?? LoadImage(_defaultOnImageLocation);
             }
         }
 

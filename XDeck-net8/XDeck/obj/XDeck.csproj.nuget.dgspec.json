@@ -1,35 +1,33 @@
 {
   "format": 1,
   "restore": {
-    "C:\\projects\\XDeck\\XDeck-net8\\XDeck\\XDeck.csproj": {}
+    "C:\\Coding\\XDeck\\XDeck-net8\\XDeck\\XDeck.csproj": {}
   },
   "projects": {
-    "C:\\projects\\XDeck\\XDeck-net8\\XDeck\\XDeck.csproj": {
+    "C:\\Coding\\XDeck\\XDeck-net8\\XDeck\\XDeck.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\projects\\XDeck\\XDeck-net8\\XDeck\\XDeck.csproj",
+        "projectUniqueName": "C:\\Coding\\XDeck\\XDeck-net8\\XDeck\\XDeck.csproj",
         "projectName": "com.valtteri.xdeck",
-        "projectPath": "C:\\projects\\XDeck\\XDeck-net8\\XDeck\\XDeck.csproj",
+        "projectPath": "C:\\Coding\\XDeck\\XDeck-net8\\XDeck\\XDeck.csproj",
         "packagesPath": "C:\\Users\\valtt\\.nuget\\packages\\",
-        "outputPath": "C:\\projects\\XDeck\\XDeck-net8\\XDeck\\obj\\",
+        "outputPath": "C:\\Coding\\XDeck\\XDeck-net8\\XDeck\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\valtt\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\valtt\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\projects\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj": {
-                "projectPath": "C:\\projects\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj"
+              "C:\\Coding\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj": {
+                "projectPath": "C:\\Coding\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj"
               }
             }
           }
@@ -51,15 +49,11 @@
           "dependencies": {
             "StreamDeck-Tools": {
               "target": "Package",
-              "version": "[6.2.0, )"
+              "version": "[6.3.1, )"
             },
             "System.Configuration.ConfigurationManager": {
               "target": "Package",
-              "version": "[8.0.0, )"
-            },
-            "System.Drawing.Common": {
-              "target": "Package",
-              "version": "[8.0.2, )"
+              "version": "[8.0.1, )"
             }
           },
           "imports": [
@@ -78,28 +72,26 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\projects\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj": {
+    "C:\\Coding\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj": {
       "version": "1.3.0",
       "restore": {
-        "projectUniqueName": "C:\\projects\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj",
+        "projectUniqueName": "C:\\Coding\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj",
         "projectName": "XPlaneConnector",
-        "projectPath": "C:\\projects\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj",
+        "projectPath": "C:\\Coding\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\XPlaneConnector.Core.csproj",
         "packagesPath": "C:\\Users\\valtt\\.nuget\\packages\\",
-        "outputPath": "C:\\projects\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\obj\\",
+        "outputPath": "C:\\Coding\\XDeck\\XDeck-net8\\XPlaneConnector\\XPlaneConnector\\XPlaneConnector.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\valtt\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\valtt\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -138,7 +130,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
