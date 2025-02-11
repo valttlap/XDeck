@@ -12,6 +12,8 @@ public sealed class XConnector
     private Connector? _connector;
     public delegate void ConnectionStarted();
     public event ConnectionStarted? OnConnectionStarted;
+    public delegate void ConnectionLost();
+    public event ConnectionLost? OnConnectionLost;
     public delegate void XPlaneOnline();
     public event XPlaneOnline? OnXPlaneOnline;
     private IPAddress? _address;
@@ -58,6 +60,7 @@ public sealed class XConnector
         _connector?.Stop();
         _connector?.Dispose();
         _connector = null;
+        OnConnectionLost?.Invoke();
         _address = IPAddress.None;
         _port = 0;
     }
