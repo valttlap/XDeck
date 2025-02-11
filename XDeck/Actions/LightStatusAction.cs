@@ -2,10 +2,10 @@ using System.Drawing;
 
 using BarRaider.SdTools;
 
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using XDeck.Backend;
+using XDeck.Models;
 
 using XPlaneConnector.Core;
 
@@ -14,70 +14,7 @@ namespace XDeck.Actions
     [PluginActionId("com.valtteri.lightstatus")]
     public class LightStatusAction : KeypadBase
     {
-        #region Settings
-
-        protected class PluginSettings
-        {
-            public static PluginSettings CreateDefaultSettings()
-            {
-                PluginSettings instance = new()
-                {
-                    Dataref = "sim/none/none",
-                    Frequency = 5,
-                    ImageMode = false,
-                    TitleMode = true,
-                    TitleImageMode = false,
-                    Image0 = null,
-                    Image1 = null,
-                    Image2 = null,
-                    Title0 = "0",
-                    Title1 = "1",
-                    Title2 = "2",
-                };
-
-                return instance;
-            }
-
-            [JsonProperty(PropertyName = "dataref")]
-            public string Dataref { get; set; } = "sim/none/none";
-
-            [JsonProperty(PropertyName = "pollFreq")]
-            public int Frequency { get; set; } = 5;
-
-            [JsonProperty(PropertyName = "modeImage")]
-            public bool ImageMode { get; set; } = false;
-
-            [JsonProperty(PropertyName = "modeTitle")]
-            public bool TitleMode { get; set; } = true;
-
-            [JsonProperty(PropertyName = "modeTitleImage")]
-            public bool TitleImageMode { get; set; } = false;
-
-            [FilenameProperty]
-            [JsonProperty(PropertyName = "image0")]
-            public string? Image0 { get; set; }
-
-            [FilenameProperty]
-            [JsonProperty(PropertyName = "image1")]
-            public string? Image1 { get; set; }
-
-            [FilenameProperty]
-            [JsonProperty(PropertyName = "image2")]
-            public string? Image2 { get; set; }
-
-            [JsonProperty(PropertyName = "title0")]
-            public string? Title0 { get; set; }
-
-            [JsonProperty(PropertyName = "title1")]
-            public string? Title1 { get; set; }
-
-            [JsonProperty(PropertyName = "title2")]
-            public string? Title2 { get; set; }
-        }
-        #endregion
-
-
-        protected readonly PluginSettings? _settings;
+        protected readonly LightStatusSettings? _settings;
         private readonly object _imageLock = new();
         private readonly XConnector _connector;
         private string? _currentDataref = null;
@@ -92,8 +29,8 @@ namespace XDeck.Actions
         public LightStatusAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
         {
             _settings = payload.Settings == null || payload.Settings.Count == 0
-                ? PluginSettings.CreateDefaultSettings()
-                : payload.Settings.ToObject<PluginSettings>();
+                ? new()
+                : payload.Settings.ToObject<LightStatusSettings>();
 
             _connector = XConnector.Instance;
             IntializeSettings();

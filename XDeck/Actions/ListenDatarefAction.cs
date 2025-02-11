@@ -1,8 +1,7 @@
-﻿using BarRaider.SdTools;
-
-using Newtonsoft.Json;
+using BarRaider.SdTools;
 
 using XDeck.Backend;
+using XDeck.Models;
 
 using XPlaneConnector.Core;
 
@@ -11,31 +10,7 @@ namespace XDeck.Actions
     [PluginActionId("com.valtteri.listendataref")]
     public class ListenDatarefAction : KeypadBase
     {
-        #region Settings
-        protected class PluginSettings
-        {
-            public static PluginSettings CreateDefaultSettings()
-            {
-                PluginSettings instance = new()
-                {
-                    Dataref = "sim/none/none"
-                };
-
-                return instance;
-            }
-
-            [JsonProperty(PropertyName = "dataref")]
-            public string Dataref { get; set; } = "sim/none/none";
-
-            [JsonProperty(PropertyName = "pollFreq")]
-            public int Frequency { get; set; } = 5;
-
-            [JsonProperty(PropertyName = "unit")]
-            public string Units { get; set; } = "Unknown";
-        }
-        #endregion
-
-        protected readonly PluginSettings? _settings;
+        protected readonly ListenDatarefSettings? _settings;
 
         private readonly XConnector _connector;
         private string? _currentDataref;
@@ -43,9 +18,8 @@ namespace XDeck.Actions
         public ListenDatarefAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
         {
             _settings = payload.Settings == null || payload.Settings.Count == 0
-                ? PluginSettings.CreateDefaultSettings()
-                : payload.Settings.ToObject<PluginSettings>();
-
+                ? new()
+                : payload.Settings.ToObject<ListenDatarefSettings>();
             _connector = XConnector.Instance;
             SubscribeDataref();
         }

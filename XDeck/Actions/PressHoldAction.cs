@@ -1,8 +1,7 @@
 using BarRaider.SdTools;
 
-using Newtonsoft.Json;
-
 using XDeck.Backend;
+using XDeck.Models;
 
 using XPlaneConnector.Core;
 
@@ -11,29 +10,9 @@ namespace XDeck.Actions
     [PluginActionId("com.valtteri.presshold")]
     public class PressHoldAction(SDConnection connection, InitialPayload payload) : KeypadBase(connection, payload)
     {
-        #region Settings
-
-        protected class PluginSettings
-        {
-            public static PluginSettings CreateDefaultSettings()
-            {
-                PluginSettings instance = new()
-
-                {
-                    Command = "sim/none/none"
-                };
-
-                return instance;
-            }
-
-            [JsonProperty(PropertyName = "xplaneCommand")]
-            public string Command { get; set; } = "sim/none/none";
-        }
-        #endregion
-
-        protected readonly PluginSettings? _settings = payload.Settings == null || payload.Settings.Count == 0
-                ? PluginSettings.CreateDefaultSettings()
-                : payload.Settings.ToObject<PluginSettings>();
+        protected readonly PressHoldSettings? _settings = payload.Settings == null || payload.Settings.Count == 0
+                ? new()
+                : payload.Settings.ToObject<PressHoldSettings>();
 
         private readonly XConnector _connector = XConnector.Instance;
 

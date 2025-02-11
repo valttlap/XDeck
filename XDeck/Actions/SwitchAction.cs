@@ -1,11 +1,10 @@
-﻿using System.Drawing;
+using System.Drawing;
 
 using BarRaider.SdTools;
-
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using XDeck.Backend;
+using XDeck.Models;
 
 using XPlaneConnector.Core;
 
@@ -14,74 +13,7 @@ namespace XDeck.Actions
     [PluginActionId("com.valtteri.switch")]
     public class SwitchAction : KeypadBase
     {
-        #region Settings
-
-        protected class PluginSettings
-        {
-            public static PluginSettings CreateDefaultSettings()
-            {
-                PluginSettings instance = new()
-
-                {
-                    Dataref = "sim/none/none",
-                    Frequency = 5,
-                    DatarefMode = true,
-                    Command = null,
-                    CommandMode = false,
-                    ImageMode = false,
-                    TitleMode = true,
-                    TitleImageMode = false,
-                    OffImage = null,
-                    OnImage = null,
-                    OffTitle = "OFF",
-                    OnTitle = "ON"
-                };
-
-                return instance;
-            }
-
-            [JsonProperty(PropertyName = "dataref")]
-            public string Dataref { get; set; } = "sim/none/none";
-
-            [JsonProperty(PropertyName = "pollFreq")]
-            public int Frequency { get; set; } = 5;
-
-            [JsonProperty(PropertyName = "command")]
-            public string? Command { get; set; }
-
-            [JsonProperty(PropertyName = "modeCommand")]
-            public bool CommandMode { get; set; } = false;
-
-            [JsonProperty(PropertyName = "modeDataref")]
-            public bool DatarefMode { get; set; } = true;
-
-            [JsonProperty(PropertyName = "modeImage")]
-            public bool ImageMode { get; set; } = false;
-
-            [JsonProperty(PropertyName = "modeTitle")]
-            public bool TitleMode { get; set; } = true;
-
-            [JsonProperty(PropertyName = "modeTitleImage")]
-            public bool TitleImageMode { get; set; } = false;
-
-            [FilenameProperty]
-            [JsonProperty(PropertyName = "offImage")]
-            public string? OffImage { get; set; }
-
-            [FilenameProperty]
-            [JsonProperty(PropertyName = "onImage")]
-            public string? OnImage { get; set; }
-
-            [JsonProperty(PropertyName = "offTitle")]
-            public string OffTitle { get; set; } = "OFF";
-
-            [JsonProperty(PropertyName = "onTitle")]
-            public string OnTitle { get; set; } = "ON";
-        }
-        #endregion
-
-
-        protected readonly PluginSettings? settings;
+        protected readonly SwitchSettings? _settings;
         protected string _defaultOffImageLocation = ".\\Images\\empty_button_off.png";
         protected string _defaultOnImageLocation = ".\\Images\\empty_button_on.png";
         private readonly object _imageLock = new();
@@ -94,15 +26,9 @@ namespace XDeck.Actions
 
         public SwitchAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
         {
-            if (payload.Settings == null || payload.Settings.Count == 0) // Called the first time you drop a new action into the Stream Deck
-            {
-                settings = PluginSettings.CreateDefaultSettings();
-            }
-            else
-            {
-                settings = payload.Settings.ToObject<PluginSettings>();
-            }
-            _connector = XConnector.Instance;
+            _settings = payload.Settings == null || payload.Settings.Count == 0
+                ? new()
+                : payload.Settings.ToObject<SwitchSettings>();
             IntializeSettings();
             SubscribeDataref();
             SaveSettings();
@@ -122,12 +48,12 @@ namespace XDeck.Actions
 
         public override void KeyPressed(KeyPayload payload)
         {
-            if (settings == null) return;
+            if (_settings == null) return;
             if (_currentDataref == null) return;
-            if (settings.CommandMode)
+            if (_settings.CommandMode)
             {
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Current mode is command");
-                var command = new XPlaneCommand(settings.Command, "Userdefined command");
+                var command = new XPlaneCommand(_settings.Command, "Userdefined command");
                 _connector.SendCommand(command);
                 return;
             }
@@ -151,7 +77,7 @@ namespace XDeck.Actions
 
         public override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
-            try { Tools.AutoPopulateSettings(settings, payload.Settings); }
+            try { Tools.AutoPopulateSettings(_settings, payload.Settings); }
             catch { }
             IntializeSettings();
             SubscribeDataref();
@@ -161,23 +87,23 @@ namespace XDeck.Actions
 
         private void SubscribeDataref()
         {
-            if (settings == null) return;
-            if (_currentDataref == settings.Dataref) return;
+            if (_settings == null) return;
+            if (_currentDataref == _settings.Dataref) return;
             if (_currentDataref != null)
             {
                 _connector.Unsubscribe(_currentDataref);
                 Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
             }
-            _currentDataref = settings.Dataref;
+            _currentDataref = _settings.Dataref;
 
             var dataref = new DataRefElement
             {
-                DataRef = settings.Dataref,
+                DataRef = _settings.Dataref,
                 Units = "Unknown",
                 Description = "Userdefined datared",
-                Frequency = settings.Frequency
+                Frequency = _settings.Frequency
             };
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {settings.Dataref}");
+            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {_settings.Dataref}");
             _connector.Subscribe(dataref, async (element, val) =>
             {
                 _currentState = (int)val;
@@ -187,18 +113,18 @@ namespace XDeck.Actions
 
         private async Task SetImageTitleAsync()
         {
-            if (settings == null) return;
-            string title = _currentState == 0 ? settings.OffTitle : settings.OnTitle;
+            if (_settings == null) return;
+            string title = _currentState == 0 ? _settings.OffTitle : _settings.OnTitle;
             Image? image = _currentState == 0 ? _offImage : _onImage;
 
-            if (settings.TitleMode)
+            if (_settings.TitleMode)
             {
                 var setTitleTask = Connection.SetTitleAsync(title);
                 var setImageTask = Connection.SetDefaultImageAsync();
 
                 await Task.WhenAll(setTitleTask, setImageTask);
             }
-            else if (settings.ImageMode)
+            else if (_settings.ImageMode)
             {
                 var setImageTask = Connection.SetImageAsync(image);
                 var setTitleTask = Connection.SetTitleAsync("");
@@ -206,7 +132,7 @@ namespace XDeck.Actions
                 await Task.WhenAll(setImageTask, setTitleTask);
 
             }
-            else if (settings.TitleImageMode)
+            else if (_settings.TitleImageMode)
             {
                 var setImageTask = Connection.SetImageAsync(image);
                 var setTitleTask = Connection.SetTitleAsync(title);
@@ -224,8 +150,8 @@ namespace XDeck.Actions
         {
             lock (_imageLock)
             {
-                _offImage = LoadImage(settings?.OffImage) ?? LoadImage(_defaultOffImageLocation);
-                _onImage = LoadImage(settings?.OnImage) ?? LoadImage(_defaultOnImageLocation);
+                _offImage = LoadImage(_settings?.OffImage) ?? LoadImage(_defaultOffImageLocation);
+                _onImage = LoadImage(_settings?.OnImage) ?? LoadImage(_defaultOnImageLocation);
             }
         }
 
@@ -246,8 +172,8 @@ namespace XDeck.Actions
 
         private void SaveSettings()
         {
-            if (settings == null) return;
-            Connection.SetSettingsAsync(JObject.FromObject(settings));
+            if (_settings == null) return;
+            Connection.SetSettingsAsync(JObject.FromObject(_settings));
         }
 
     }

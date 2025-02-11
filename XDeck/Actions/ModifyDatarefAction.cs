@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using XDeck.Backend;
+using XDeck.Models;
 
 using XPlaneConnector.Core;
 
@@ -12,51 +13,7 @@ namespace XDeck.Actions
     [PluginActionId("com.valtteri.modifydataref")]
     public class ModifyDatarefAction : KeypadBase
     {
-        #region Settings
-        protected class PluginSettings
-        {
-            public static PluginSettings CreateDefaultSettings()
-            {
-                // Default settings are applied here, assuming they meet the initial business logic requirements.
-                return new PluginSettings
-                {
-                    Dataref = "sim/none/none",
-                    Frequency = "55",
-                    IncreaseDatarefMode = true, // Ensure default settings comply with the business rules
-                    // DecreaseDatarefMode and SetDatarefMode are false by default
-                    MaxRefValue = "1",
-                    MinRefValue = "0",
-                    SetRefValue = "1"
-                    // MinRefValue and SetRefValue are null by default, which is acceptable since IncreaseDatarefMode is true
-                };
-            }
-
-            [JsonProperty(PropertyName = "dataref")]
-            public string Dataref { get; set; } = "sim/none/none";
-            [JsonProperty(PropertyName = "pollFreq")]
-            public string Frequency { get; set; } = "5";
-
-            [JsonProperty(PropertyName = "modeIncrease")]
-            public bool IncreaseDatarefMode { get; set; } = true;
-
-            [JsonProperty(PropertyName = "modeDecrease")]
-            public bool DecreaseDatarefMode { get; set; } = false;
-
-            [JsonProperty(PropertyName = "modeSet")]
-            public bool SetDatarefMode { get; set; } = false;
-
-            [JsonProperty(PropertyName = "maxRefVal")]
-            public string MaxRefValue { get; set; } = "1";
-            [JsonProperty(PropertyName = "minRefVal")]
-            public string MinRefValue { get; set; } = "0";
-
-            [JsonProperty(PropertyName = "setRefVal")]
-            public string SetRefValue { get; set; } = "1";
-
-        }
-        #endregion
-
-        protected readonly PluginSettings? _settings;
+        protected readonly ModifyDatarefSettings? _settings;
         private readonly XConnector _connector;
         private string? _currentDataref;
         private int _currentValue = 0;
@@ -64,14 +21,9 @@ namespace XDeck.Actions
 
         public ModifyDatarefAction(ISDConnection connection, InitialPayload payload) : base(connection, payload)
         {
-            if (payload.Settings == null || payload.Settings.Count == 0) // Called the first time you drop a new action into the Stream Deck
-            {
-                _settings = PluginSettings.CreateDefaultSettings();
-            }
-            else
-            {
-                _settings = payload.Settings.ToObject<PluginSettings>();
-            }
+            _settings = payload.Settings == null || payload.Settings.Count == 0
+                ? new()
+                : payload.Settings.ToObject<ModifyDatarefSettings>();
             _connector = XConnector.Instance;
             SubscribeDataref();
             SaveSettings();
@@ -158,8 +110,6 @@ namespace XDeck.Actions
         private void SubscribeDataref()
         {
             if (_settings == null) return;
-            if (!int.TryParse(_settings.Frequency, out int freq)) return;
-            if (_currentDataref == _settings.Dataref) return;
             if (_currentDataref != null)
             {
                 _connector.Unsubscribe(_currentDataref);
@@ -172,7 +122,7 @@ namespace XDeck.Actions
                 DataRef = _settings.Dataref,
                 Units = "Unknown",
                 Description = "User defined dataref",
-                Frequency = freq
+                Frequency = _settings.Frequency
             };
             Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Subscribing dataref: {_settings.Dataref}");
             _connector.Subscribe(dataref, (element, val) => _currentValue = (int)val);
