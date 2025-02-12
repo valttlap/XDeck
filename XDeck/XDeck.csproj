@@ -11,7 +11,6 @@
     <OutputPath>bin\$(Configuration)\com.valtteri.xdeck.sdPlugin\</OutputPath>
     <Platforms>AnyCPU</Platforms>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Authors>Valtteri Lappalainen</Authors>
   </PropertyGroup>
 
@@ -19,14 +18,9 @@
     <OutputPath>$(APPDATA)\Elgato\StreamDeck\Plugins\com.valtteri.xdeck.sdPlugin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>$(APPDATA)\Elgato\StreamDeck\Plugins\com.valtteri.xdeck.sdPlugin\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="StreamDeck-Tools" Version="6.3.1" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,10 +40,10 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <Target Name="PreBuild" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" BeforeTargets="PreBuildEvent">
     <Exec Command="taskkill -f -t -im StreamDeck.exe -fi &quot;status eq running&quot;" />
   </Target>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" AfterTargets="PostBuildEvent">
     <Exec Command="call &quot;%ProgramW6432%\Elgato\StreamDeck\StreamDeck.exe&quot;" />
   </Target>
 
