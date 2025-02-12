@@ -9,7 +9,7 @@ using XPlaneConnector.Core;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.switch")]
-public class SwitchAction(SDConnection connection, InitialPayload payload) : DatarefActionBase<SwitchSettings>(connection, payload)
+public class SwitchAction(ISDConnection connection, InitialPayload payload) : DatarefActionBase<SwitchSettings>(connection, payload)
 {
     protected string _defaultOffImageLocation = ".\\Images\\empty_button_off.png";
     protected string _defaultOnImageLocation = ".\\Images\\empty_button_on.png";
@@ -59,7 +59,6 @@ public class SwitchAction(SDConnection connection, InitialPayload payload) : Dat
     protected override void SubscribeDataref()
     {
         if (_settings == null) return;
-        if (_currentDataref == _settings.Dataref) return;
         if (_currentDataref != null)
         {
             _connector.Unsubscribe(_currentDataref);

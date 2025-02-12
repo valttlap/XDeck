@@ -8,7 +8,7 @@ public class SwitchSettings : BaseDatarefSettings
 {
    
     [JsonProperty(PropertyName = "command")]
-    public string? Command { get; set; }
+    public string Command { get; set; } = "sim/none/none";
 
     [JsonProperty(PropertyName = "modeCommand")]
     public bool CommandMode { get; set; } = false;

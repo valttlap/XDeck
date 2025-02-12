@@ -12,7 +12,7 @@ public abstract class CommandActionBase<TSettings> : KeypadBase
     protected readonly XConnector _connector = XConnector.Instance;
     protected string? _currentDataref;
 
-    protected CommandActionBase(SDConnection connection, InitialPayload payload)
+    protected CommandActionBase(ISDConnection connection, InitialPayload payload)
         : base(connection, payload)
     {
         // 1. Grab or initialize the settings

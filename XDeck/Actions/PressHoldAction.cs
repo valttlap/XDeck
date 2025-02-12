@@ -7,7 +7,7 @@ using XPlaneConnector.Core;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.presshold")]
-public class PressHoldAction(SDConnection connection, InitialPayload payload) : CommandActionBase<PressHoldSettings>(connection, payload)
+public class PressHoldAction(ISDConnection connection, InitialPayload payload) : CommandActionBase<PressHoldSettings>(connection, payload)
 {
     private CancellationTokenSource? _cancelToken;
 

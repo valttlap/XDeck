@@ -7,7 +7,7 @@ using XPlaneConnector.Core;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.listendataref")]
-public class ListenDatarefAction(SDConnection connection, InitialPayload payload) : DatarefActionBase<ListenDatarefSettings>(connection, payload)
+public class ListenDatarefAction(ISDConnection connection, InitialPayload payload) : DatarefActionBase<ListenDatarefSettings>(connection, payload)
 {
     protected override void SubscribeDataref()
     {

@@ -7,7 +7,7 @@ using XPlaneConnector.Core;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.modifydataref")]
-public class ModifyDatarefAction(SDConnection connection, InitialPayload payload) : DatarefActionBase<ModifyDatarefSettings>(connection, payload)
+public class ModifyDatarefAction(ISDConnection connection, InitialPayload payload) : DatarefActionBase<ModifyDatarefSettings>(connection, payload)
 {
     private int _currentValue = 0;
 

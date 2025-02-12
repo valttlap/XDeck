@@ -7,7 +7,7 @@ using XPlaneConnector.Core;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.pressholdloop")]
-public class PressHoldLoopAction(SDConnection connection, InitialPayload payload) : CommandActionBase<PressHoldLoopSettings>(connection, payload)
+public class PressHoldLoopAction(ISDConnection connection, InitialPayload payload) : CommandActionBase<PressHoldLoopSettings>(connection, payload)
 {
     private bool _isPressed = false;
 

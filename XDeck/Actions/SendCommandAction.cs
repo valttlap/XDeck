@@ -7,7 +7,7 @@ using XPlaneConnector.Core;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.sendcommand")]
-public class SendCommandAction(SDConnection connection, InitialPayload payload) : CommandActionBase<SendCommandSettings>(connection, payload)
+public class SendCommandAction(ISDConnection connection, InitialPayload payload) : CommandActionBase<SendCommandSettings>(connection, payload)
 {
     public override void KeyPressed(KeyPayload payload)
     {

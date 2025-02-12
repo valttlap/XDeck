@@ -5,7 +5,7 @@ using XDeck.Backend;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.connstop")]
-public class StopAction(SDConnection connection, InitialPayload payload) : KeypadBase(connection, payload)
+public class StopAction(ISDConnection connection, InitialPayload payload) : KeypadBase(connection, payload)
 {
     private readonly XConnector _connector = XConnector.Instance;
 

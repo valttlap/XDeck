@@ -5,7 +5,7 @@ using XDeck.Backend;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.connstart")]
-public class StartAction(SDConnection connection, InitialPayload payload) : KeypadBase(connection, payload)
+public class StartAction(ISDConnection connection, InitialPayload payload) : KeypadBase(connection, payload)
 {
     private readonly XConnector _connector = XConnector.Instance;
 

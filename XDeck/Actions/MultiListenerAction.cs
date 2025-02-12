@@ -9,7 +9,7 @@ using XPlaneConnector.Core;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.multilistener")]
-public class MultiListenerAction(SDConnection connection, InitialPayload payload) : DatarefActionBase<MultiListenerSettings>(connection, payload)
+public class MultiListenerAction(ISDConnection connection, InitialPayload payload) : DatarefActionBase<MultiListenerSettings>(connection, payload)
 {
     private readonly object _imageLock = new();
     private int? _currentValue = 0;
@@ -28,7 +28,6 @@ public class MultiListenerAction(SDConnection connection, InitialPayload payload
     protected override void SubscribeDataref()
     {
         if (_settings == null) return;
-        if (_currentDataref == _settings.Dataref) return;
         if (_currentDataref != null)
         {
             _connector.Unsubscribe(_currentDataref);

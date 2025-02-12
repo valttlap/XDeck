@@ -9,7 +9,7 @@ using XPlaneConnector.Core;
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.lightstatus")]
-public class LightStatusAction(SDConnection connection, InitialPayload payload) : DatarefActionBase<LightStatusSettings>(connection, payload)
+public class LightStatusAction(ISDConnection connection, InitialPayload payload) : DatarefActionBase<LightStatusSettings>(connection, payload)
 {
     private readonly object _imageLock = new();
     private int _currentState = 0;
@@ -34,7 +34,6 @@ public class LightStatusAction(SDConnection connection, InitialPayload payload) 
     protected override void SubscribeDataref()
     {
         if (_settings == null) return;
-        if (_currentDataref == _settings.Dataref) return;
         if (_currentDataref != null)
         {
             _connector.Unsubscribe(_currentDataref);

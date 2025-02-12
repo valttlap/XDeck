@@ -31,7 +31,7 @@
 
   <ItemGroup>
     <ProjectReference
-      Include="..\XPlaneConnector\XPlaneConnector\XPlaneConnector.Core\XPlaneConnector.Core.csproj" />
+      Include="..\XPlaneConnector\XPlaneConnector.Core\XPlaneConnector.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
