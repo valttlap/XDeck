@@ -2,140 +2,32 @@ using System.Drawing;
 
 using BarRaider.SdTools;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-using XDeck.Backend;
+using XDeck.Models;
 
 using XPlaneConnector.Core;
 
 namespace XDeck.Actions;
 
 [PluginActionId("com.valtteri.multilistener")]
-public class MultiListenerAction : KeypadBase
+public class MultiListenerAction(ISDConnection connection, InitialPayload payload) : DatarefActionBase<MultiListenerSettings>(connection, payload)
 {
-    #region Settings
-    protected class PluginSettings
-    {
-        private string? _settingsJson;
-
-        [JsonProperty(PropertyName = "dataref")]
-        public string Dataref { get; set; } = "sim/none/none";
-
-        [JsonProperty(PropertyName = "pollFreq")]
-        public int Frequency { get; set; } = 5;
-
-        [JsonProperty(PropertyName = "settingsJson")]
-        public string? SettingsJson
-        {
-            get => _settingsJson;
-            set
-            {
-                _settingsJson = value;
-                if (!string.IsNullOrEmpty(_settingsJson))
-                {
-                    try
-                    {
-                        Settings = JsonConvert.DeserializeObject<Dictionary<int, DataRef>>(_settingsJson) ?? [];
-                    }
-                    catch (JsonException)
-                    {
-                        Settings = [];
-                    }
-                }
-                else
-                {
-                    Settings = [];
-                }
-            }
-        }
-
-        [JsonIgnore]
-        public Dictionary<int, DataRef> Settings { get; set; } = [];
-
-        public static PluginSettings CreateDefaultSettings()
-        {
-            PluginSettings instance = new();
-            return instance;
-        }
-    }
-
-    protected class DataRef
-    {
-        [JsonProperty("title")]
-        public string? Title { get; set; }
-
-        [JsonProperty("imagePath")]
-        public string? ImagePath { get; set; }
-        [JsonIgnore]
-        public Image? Image { get; set; }
-    }
-    #endregion
-
-    private readonly PluginSettings? _settings;
     private readonly object _imageLock = new();
-    private readonly XConnector _connector;
-    private string? _currentDataref;
     private int? _currentValue = 0;
 
-    public MultiListenerAction(ISDConnection connection, InitialPayload payload) : base(connection, payload)
+    protected override void OnInit()
     {
-        if (payload.Settings == null || payload.Settings.Count == 0) // Called the first time you drop a new action into the Stream Deck
-        {
-            _settings = PluginSettings.CreateDefaultSettings();
-        }
-        else
-        {
-            _settings = payload.Settings.ToObject<PluginSettings>();
-        }
-        _connector = XConnector.Instance;
-        if (_settings is null || _settings.Settings is null || _settings.Settings.Count == 0) return;
         InitializeSettings();
-        SubscribeDataref();
-        SaveSettings();
-
-    }
-    public override void Dispose()
-    {
-        if (_currentDataref is not null)
-        {
-            _connector.Unsubscribe(_currentDataref);
-            Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Unsubscribed dataref: {_currentDataref}");
-        }
-        Logger.Instance.LogMessage(TracingLevel.INFO, $"{GetType()} Destructor called");
-        GC.SuppressFinalize(this);
+        base.OnInit();
     }
 
-    public override void KeyPressed(KeyPayload payload)
+    protected override void OnSettingsUpdated()
     {
-    }
-
-    public override void KeyReleased(KeyPayload payload)
-    {
-    }
-
-    public override void OnTick()
-    {
-    }
-
-    public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
-    {
-    }
-
-    public override void ReceivedSettings(ReceivedSettingsPayload payload)
-    {
-        try { Tools.AutoPopulateSettings(_settings, payload.Settings); }
-        catch { }
-        if (_settings == null || _settings.Settings == null || _settings.Settings.Count == 0) return;
         InitializeSettings();
-        SubscribeDataref();
-        SaveSettings();
     }
 
-    private void SubscribeDataref()
+    protected override void SubscribeDataref()
     {
         if (_settings == null) return;
-        if (_currentDataref == _settings.Dataref) return;
         if (_currentDataref != null)
         {
             _connector.Unsubscribe(_currentDataref);
@@ -228,11 +120,5 @@ public class MultiListenerAction : KeypadBase
     private static Image? LoadImage(string? imagePath)
     {
         return string.IsNullOrEmpty(imagePath) || !File.Exists(imagePath) ? null : Image.FromFile(imagePath);
-    }
-
-    private void SaveSettings()
-    {
-        if (_settings == null) return;
-        Connection.SetSettingsAsync(JObject.FromObject(_settings));
     }
 }
