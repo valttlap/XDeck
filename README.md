@@ -127,10 +127,3 @@ The **Listen multiple datarefs** feature extends the functionality of the  [**3-
 
 * **Add Element** – Adds a new **Value, Title, Image** block.
 * **Remove Element**– Removes the last **Value, Title, Image** block.
-
-## Known issues
-
-If Stream Deck is started before X-Plane, buttons that listen to DataRefs in the current view may not function correctly.
-
-**Workaround**:
-To resolve this issue, switch to another view (such as a folder or a different profile) and then return to the original view. This should restore functionality for all actions.
